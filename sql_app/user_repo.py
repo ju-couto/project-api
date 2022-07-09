@@ -5,7 +5,7 @@ from . import models, schemas
 
 class UserRepo:
     async def create(db: Session, user: schemas.User):
-        db_user = models.User(username=user.username, hash_password=user.hash_password)
+        db_user = models.User(username=user.username, password=user.password)
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
@@ -21,7 +21,7 @@ class UserRepo:
         return db.query(models.User).offset(skip).limit(limit).all()
 
     async def delete(db: Session,user_id):
-        db_user = db.query(models.User).filter_by(id=user_id).first()
+        db_user = db.query(models.User).filter_by(id=id).first()
         db.delete(db_user)
         db.commit()
 

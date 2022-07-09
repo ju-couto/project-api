@@ -1,10 +1,11 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class UserBase(BaseModel):
-    id: int
+    id: Optional[int] = None
     username: str
-    hash_password: str
+    password: str
 
 
 class UserCreate(UserBase):
@@ -12,14 +13,14 @@ class UserCreate(UserBase):
 
 
 class User(UserBase):
-    user_id: int
+    id: int
 
     class Config:
         orm_mode = True
 
 
 class AuthorBase(BaseModel):
-    id: int
+    id: Optional[int] = None
     name: str
     picture: str
 
@@ -36,7 +37,7 @@ class Author(AuthorBase):
 
 
 class PaperBase(BaseModel):
-    id: int
+    id: Optional[int] = None
     author: Author
     title: str
     summary: str

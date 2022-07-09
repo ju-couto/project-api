@@ -6,9 +6,9 @@ from db import Base
 class User(Base):
     __tablename__ = 'user'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     username = Column(String, unique=True)
-    hash_password = Column(String)
+    password = Column(String)
 
     def __repr__(self):
         return f'User {self.username}'
