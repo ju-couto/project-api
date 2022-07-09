@@ -54,3 +54,8 @@ class Paper(PaperBase):
 
     class Config:
         orm_mode = True
+
+
+class Login(BaseModel):
+    username: str
+    password: str
