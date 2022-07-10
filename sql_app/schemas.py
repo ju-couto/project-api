@@ -59,3 +59,13 @@ class Paper(PaperBase):
 class Login(BaseModel):
     username: str
     password: str
+
+
+class UserData(BaseModel):
+    username: str
+
+
+class SuccessLogin(BaseModel):
+    user: str
+    access_token: str
+

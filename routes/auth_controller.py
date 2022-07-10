@@ -21,7 +21,7 @@ async def sign_up(user_request: schemas.UserCreate, db: Session = Depends(get_db
     return await UserRepo.create(db=db, user=user_request)
 
 
-@router.post('/token')
+@router.post('/token', response_model=schemas.SuccessLogin)
 def login(login_request: schemas.Login, db: Session = Depends(get_db)):
     """
     Get access token
@@ -35,7 +35,7 @@ def login(login_request: schemas.Login, db: Session = Depends(get_db)):
     if not valid_password:
         raise HTTPException(status_code=400, detail='Incorrect username or password!')
     token = create_access_token({'sub': user_db.username})
-    return {'user': user_db, 'access_token': token}
+    return schemas.SuccessLogin(user=user_db.username, access_token=token)
 
 
 @router.get('/me')
