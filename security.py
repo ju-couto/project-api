@@ -11,7 +11,7 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl='token')
 # CONFIG
 SECRET_KEY = '43DDC799099616CC04D43815AAD5694B0768F7C66F2D1F193C2017786E7D3FB5'
 ALGORITHM = 'HS256'
-EXPIRES_IN_MIN = 5
+EXPIRES_IN_MIN = 10
 
 
 def verify_password(plain_password: str, hashed_password: str):
@@ -34,20 +34,29 @@ def create_access_token(data: dict):
 
 def verify_access_token(token: str):
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    return payload.get('sub')
+    return payload
 
 
 def logged_user(token: str = Depends(oauth2_schema), db: Session = Depends(get_db)):
     exception = HTTPException(status_code=401, detail='Invalid token!')
     try:
-        username = verify_access_token(token)
+        username = verify_access_token(token).get('user')
     except JWTError:
         raise exception
 
     if not username:
         raise exception
+
     db_user = UserRepo.fetch_by_username(db, username=username)
 
     if not db_user:
         raise exception
     return db_user
+
+
+def access_admin(current_user: str = Depends(logged_user)):
+    exception = HTTPException(status_code=401, detail='Invalid token!')
+    if not current_user.type == 'admin':
+        raise exception
+    return current_user
+

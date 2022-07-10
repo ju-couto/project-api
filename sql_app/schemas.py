@@ -1,11 +1,12 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class UserBase(BaseModel):
-    id: Optional[int] = None
+    id: int
     username: str
     password: str
+    type: Optional[str]
 
 
 class UserCreate(UserBase):
@@ -20,7 +21,7 @@ class User(UserBase):
 
 
 class AuthorBase(BaseModel):
-    id: Optional[int] = None
+    id: int
     name: str
     picture: str
 

@@ -17,7 +17,7 @@ def validation_exception_handler(request, err):
     return JSONResponse(status_code=400, content={'message': f'{base_error_message}. Detail: {err}'})
 
 
-app.include_router(author_controller.router)
+app.include_router(author_controller.router, prefix='/authors')
 app.include_router(auth_controller.router, prefix='/auth')
 
 

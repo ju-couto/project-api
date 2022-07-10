@@ -9,9 +9,10 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     username = Column(String, unique=True)
     password = Column(String)
+    type = Column(String, default='user')
 
     def __repr__(self):
-        return f'User {self.username}'
+        return f'{self.username}, {self.type}'
 
 
 class Author(Base):

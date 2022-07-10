@@ -15,7 +15,7 @@ class AuthorRepo:
         return db.query(models.Author).filter(models.Author.id == _id).first()
 
     def fetch_by_name(db: Session, name):
-        return db.query(models.Author).filter(models.Author.name == name).first()
+        return db.query(models.Author).filter(models.Author.name.contains(name)).first()
 
     def fetch_all(db: Session, skip: int = 0, limit: int = 100):
         return db.query(models.Author).offset(skip).limit(limit).all()
