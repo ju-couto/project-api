@@ -5,7 +5,7 @@ from sql_app import models, schemas
 
 class UserRepo:
     async def create(db: Session, user: schemas.User):
-        db_user = models.User(username=user.username, password=user.password)
+        db_user = models.User(username=user.username, password=user.password, type=user.type)
         db.add(db_user)
         db.commit()
         db.refresh(db_user)

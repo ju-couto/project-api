@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from typing import List, Optional
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from db import Session, get_db
 from security import access_admin
 from sql_app import schemas
@@ -7,10 +9,12 @@ from sql_app.repositories.paper_repo import PaperRepo
 from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address, default_limits=['1/minute'])
 
 
 @router.post('/', response_model=schemas.Paper, status_code=201)
-async def create_paper(paper_request: schemas.PaperCreate, admin: str = Depends(access_admin),
+@limiter.limit('5/minute')
+async def create_paper(request: Request, paper_request: schemas.PaperCreate, admin: str = Depends(access_admin),
                        db: Session = Depends(get_db)):
     """
     Create a new paper
@@ -23,7 +27,8 @@ async def create_paper(paper_request: schemas.PaperCreate, admin: str = Depends(
 
 
 @router.get('/', tags=['Paper'], response_model=List[schemas.PaperRead])
-async def get_all_papers(search: Optional[str] = None, db: Session = Depends(get_db)):
+@limiter.limit('5/minute')
+async def get_all_papers(request: Request, search: Optional[str] = None, db: Session = Depends(get_db)):
     """
     Get all papers from the database
     """
@@ -38,7 +43,8 @@ async def get_all_papers(search: Optional[str] = None, db: Session = Depends(get
 
 
 @router.patch('/{id}', status_code=204)
-async def update_paper(id: int, paper_request: schemas.PaperUpdate, db: Session = Depends(get_db),
+@limiter.limit('5/minute')
+async def update_paper(request: Request, id: int, paper_request: schemas.PaperUpdate, db: Session = Depends(get_db),
                        admin: str = Depends(access_admin)):
     """
     Update paper information

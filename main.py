@@ -16,9 +16,9 @@ def validation_exception_handler(request, err):
     return JSONResponse(status_code=400, content={'message': f'{base_error_message}. Detail: {err}'})
 
 
-app.include_router(author_controller.router, prefix='/authors')
-app.include_router(auth_controller.router, prefix='/auth')
-app.include_router(paper_controller.router, prefix='/papers')
+app.include_router(author_controller.router, prefix='/authors', tags=['Author'])
+app.include_router(auth_controller.router, prefix='/auth', tags=['User'])
+app.include_router(paper_controller.router, prefix='/papers', tags=['Paper'])
 
 
 if __name__ == '__main__':

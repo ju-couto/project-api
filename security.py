@@ -60,3 +60,17 @@ def access_admin(current_user: str = Depends(logged_user)):
         raise exception
     return current_user
 
+
+def get_expiration(token: str=Depends(oauth2_schema)):
+    try:
+        payload = verify_access_token(token)
+    except JWTError:
+        raise HTTPException(status_code=401, detail='Invalid token!')
+    exp_time = payload.get('exp')
+    exp = datetime.fromtimestamp(exp_time)
+    now =  datetime.now()
+    if exp > now:
+        return exp.strftime('Expiration: %d/%m/%Y %H:%M')
+    else:
+        raise HTTPException(status_code=401, detail='Expired token!')
+

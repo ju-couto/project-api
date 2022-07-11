@@ -1,6 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from typing import Optional, List
 from fastapi.encoders import jsonable_encoder
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from db import get_db, Session
 from sql_app.repositories.author_repo import AuthorRepo
@@ -8,10 +10,12 @@ from sql_app import schemas
 from security import access_admin
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address, default_limits=['1/minute'])
 
 
 @router.post('/', tags=['Author'], response_model=schemas.Author, status_code=201)
-async def create_author(author_request: schemas.AuthorCreate, admin: str = Depends(access_admin),
+@limiter.limit('5/minute')
+async def create_author(request: Request, author_request: schemas.AuthorCreate, admin: str = Depends(access_admin),
                         db: Session = Depends(get_db)):
     """
     Create a new author
@@ -25,7 +29,8 @@ async def create_author(author_request: schemas.AuthorCreate, admin: str = Depen
 
 
 @router.get('/', tags=['Author'], response_model=List[schemas.Author])
-def get_all_authors(name: Optional[str] = None, db: Session = Depends(get_db)):
+@limiter.limit('5/minute')
+def get_all_authors(request: Request, name: Optional[str] = None, db: Session = Depends(get_db)):
     """
     Get all authors from the database
     """
@@ -39,7 +44,8 @@ def get_all_authors(name: Optional[str] = None, db: Session = Depends(get_db)):
 
 
 @router.patch('/{id}', status_code=204)
-async def update_author(id: int, author_request: schemas.AuthorUpdate, db: Session = Depends(get_db),
+@limiter.limit('5/minute')
+async def update_author(request: Request, id: int, author_request: schemas.AuthorUpdate, db: Session = Depends(get_db),
                         admin: str = Depends(access_admin)):
     """
     Update author information

@@ -3,10 +3,10 @@ from typing import Optional, List
 
 
 class UserBase(BaseModel):
-    id: int
+    id: Optional[int] = None
     username: str
     password: str
-    type: Optional[str]
+    type: str
 
 
 class UserCreate(UserBase):
@@ -35,7 +35,7 @@ class SuccessLogin(BaseModel):
 
 
 class AuthorBase(BaseModel):
-    id: int
+    id: Optional[int] = None
     name: str
     picture: str
 
@@ -101,3 +101,7 @@ class PaperUpdate (BaseModel):
     first_paragraph: Optional[str]
     body: Optional[str]
 
+
+class Token (BaseModel):
+    access_token: str
+    expiration: str

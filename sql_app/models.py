@@ -10,7 +10,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     username = Column(String, unique=True)
     password = Column(String)
-    type = Column(String, default='user')
+    type = Column(String)
 
     def __repr__(self):
         return f'{self.username}, {self.type}'
