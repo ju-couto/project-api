@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Optional
 
 from db import get_db, Session
-from sql_app.user_repo import UserRepo
+from sql_app.repositories.user_repo import UserRepo
 from sql_app import schemas
 from security import get_password_hash, verify_password, create_access_token, logged_user, access_admin
 
@@ -40,6 +40,9 @@ def login(login_request: schemas.Login, db: Session = Depends(get_db)):
 
 @router.get('/me')
 def me(user: schemas.User = Depends(logged_user)):
+    """
+    Get current user
+    """
     return user
 
 

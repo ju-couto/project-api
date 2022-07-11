@@ -2,8 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from starlette.responses import RedirectResponse, JSONResponse
 import uvicorn
 
-from routes import author_controller
-from routes import auth_controller
+from routes import author_controller, auth_controller, paper_controller
 from sql_app import models as models
 from db import engine
 
@@ -19,6 +18,7 @@ def validation_exception_handler(request, err):
 
 app.include_router(author_controller.router, prefix='/authors')
 app.include_router(auth_controller.router, prefix='/auth')
+app.include_router(paper_controller.router, prefix='/papers')
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ from typing import Optional, List
 from fastapi.encoders import jsonable_encoder
 
 from db import get_db, Session
-from sql_app.author_repo import AuthorRepo
+from sql_app.repositories.author_repo import AuthorRepo
 from sql_app import schemas
 from security import access_admin
 
@@ -41,20 +41,20 @@ def get_all_authors(name: Optional[str] = None, db: Session = Depends(get_db)):
 
 
 @router.patch('/{id}', status_code=204)
-async def update_author(id: int, author_request: schemas.Author, db: Session = Depends(get_db),
+async def update_author(id: int, author_request: schemas.AuthorUpdate, db: Session = Depends(get_db),
                         admin: str = Depends(access_admin)):
     """
     Update author information.
     """
+    if admin:
+        db_author = AuthorRepo.fetch_by_id(db, id)
+        if db_author:
+            update_author_encoded = jsonable_encoder(author_request)
+            if update_author_encoded['name']:
+                db_author.name = update_author_encoded['name']
+            if update_author_encoded['picture']:
+                db_author.picture = update_author_encoded['picture']
 
-    db_author = AuthorRepo.fetch_by_id(db, id)
-    print(db_author)
-    if db_author:
-        update_author_encoded = jsonable_encoder(author_request)
-        db_author.id = update_author_encoded['id']
-        db_author.name = update_author_encoded['name']
-        db_author.picture = update_author_encoded['picture']
+            return await AuthorRepo.update(db=db, author_data=db_author)
 
-        return await AuthorRepo.update(db=db, author_data=db_author)
-
-    raise HTTPException(status_code=400, detail='Author not found with the given ID')
+        raise HTTPException(status_code=400, detail='Author not found with the given ID')

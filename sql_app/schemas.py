@@ -37,12 +37,18 @@ class Author(AuthorBase):
         orm_mode = True
 
 
+class AuthorUpdate (BaseModel):
+    name: Optional[str]
+    picture: Optional[str]
+
+
 class PaperBase(BaseModel):
-    id: Optional[int] = None
-    author: Author
+    id: int
+    author_id: int
     title: str
+    category: str
     summary: str
-    firstParagraph: str
+    first_paragraph: str
     body: str
 
 
@@ -55,6 +61,16 @@ class Paper(PaperBase):
 
     class Config:
         orm_mode = True
+
+
+class PaperRead(BaseModel):
+    id: int
+    author: Optional[Author]
+    title: str
+    category: str
+    summary: str
+    first_paragraph: str
+    body: str
 
 
 class Login(BaseModel):

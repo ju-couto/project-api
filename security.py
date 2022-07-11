@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException
 from db import Session, get_db
-from sql_app.user_repo import UserRepo
+from sql_app.repositories.user_repo import UserRepo
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_schema = OAuth2PasswordBearer(tokenUrl='token')

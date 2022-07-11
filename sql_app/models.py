@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 from db import Base
 
@@ -22,6 +23,7 @@ class Author(Base):
     name = Column(String)
     picture = Column(String)
 
+    papers = relationship('Paper', back_populates='author')
     def __repr__(self):
         return f'Author {self.name}'
 
@@ -29,10 +31,16 @@ class Author(Base):
 class Paper(Base):
     __tablename__ = 'paper'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    author_id = Column(Integer, ForeignKey('author.id'))
+    author_id = Column(Integer, ForeignKey('author.id', name='author_id'))
     category = Column(String)
     title = Column(String)
     summary = Column(String)
     first_paragraph = Column(String)
     body = Column(String)
+
+    author = relationship('Author', back_populates='papers')
+
+    def __repr__(self):
+        return f'{self.title}, {self.author_id}'
+
 
