@@ -20,6 +20,20 @@ class User(UserBase):
         orm_mode = True
 
 
+class Login(BaseModel):
+    username: str
+    password: str
+
+
+class UserData(BaseModel):
+    username: str
+
+
+class SuccessLogin(BaseModel):
+    user: str
+    access_token: str
+
+
 class AuthorBase(BaseModel):
     id: int
     name: str
@@ -43,7 +57,7 @@ class AuthorUpdate (BaseModel):
 
 
 class PaperBase(BaseModel):
-    id: int
+    id: Optional[int] = None
     author_id: int
     title: str
     category: str
@@ -63,8 +77,8 @@ class Paper(PaperBase):
         orm_mode = True
 
 
-class PaperRead(BaseModel):
-    id: int
+class PaperReadBase(BaseModel):
+    id: Optional[int] = None
     author: Optional[Author]
     title: str
     category: str
@@ -73,16 +87,17 @@ class PaperRead(BaseModel):
     body: str
 
 
-class Login(BaseModel):
-    username: str
-    password: str
+class PaperRead(PaperReadBase):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 
-class UserData(BaseModel):
-    username: str
-
-
-class SuccessLogin(BaseModel):
-    user: str
-    access_token: str
+class PaperUpdate (BaseModel):
+    title: Optional[str]
+    category: Optional[str]
+    summary: Optional[str]
+    first_paragraph: Optional[str]
+    body: Optional[str]
 

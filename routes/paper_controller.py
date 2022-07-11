@@ -4,12 +4,14 @@ from db import Session, get_db
 from security import access_admin
 from sql_app import schemas
 from sql_app.repositories.paper_repo import PaperRepo
+from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
 
 
 @router.post('/', response_model=schemas.Paper, status_code=201)
-async def create_paper(paper_request: schemas.PaperCreate, admin: str = Depends(access_admin), db: Session = Depends(get_db)):
+async def create_paper(paper_request: schemas.PaperCreate, admin: str = Depends(access_admin),
+                       db: Session = Depends(get_db)):
     """
     Create a new paper
     """
@@ -20,18 +22,42 @@ async def create_paper(paper_request: schemas.PaperCreate, admin: str = Depends(
         return PaperRepo.create(db=db, paper=paper_request)
 
 
-@router.get('/', tags=['Paper'], response_model=List[schemas.Paper])
-async def get_all_papers(search_str: Optional[str] = None, db: Session =  Depends(get_db)):
+@router.get('/', tags=['Paper'], response_model=List[schemas.PaperRead])
+async def get_all_papers(search: Optional[str] = None, db: Session = Depends(get_db)):
     """
     Get all papers from the database
     """
-    if search_str:
+    if search:
         papers = []
-        db_paper_by_title = PaperRepo.fetch_by_title(db, search_str)
-        db_paper_by_summary = PaperRepo.fetch_by_summary(db, search_str)
-        if not db_paper_by_summary and not db_paper_by_title:
+        db_paper = PaperRepo.search_by_summary_or_title(db, search)
+        if not db_paper:
             raise HTTPException(status_code=400, detail='Paper not found!')
-        papers.append(db_paper_by_summary or db_paper_by_title)
-        return papers
+        return db_paper
     else:
         return PaperRepo.fetch_all(db)
+
+
+@router.patch('/{id}', status_code=204)
+async def update_paper(id: int, paper_request: schemas.PaperUpdate, db: Session = Depends(get_db),
+                       admin: str = Depends(access_admin)):
+    """
+    Update paper information
+    """
+    if admin:
+        db_paper = PaperRepo.fetch_by_id(db, id)
+        if db_paper:
+            update_author_encoded = jsonable_encoder(paper_request)
+            if update_author_encoded['summary']:
+                db_paper.summary = update_author_encoded['summary']
+            if update_author_encoded['body']:
+                db_paper.body = update_author_encoded['body']
+            if update_author_encoded['category']:
+                db_paper.category = update_author_encoded['category']
+            if update_author_encoded['first_paragraph']:
+                db_paper.first_paragraph = update_author_encoded['first_paragraph']
+            if update_author_encoded['title']:
+                db_paper.title = update_author_encoded['title']
+
+            return await PaperRepo.update(db=db, paper_data=db_paper)
+
+        raise HTTPException(status_code=400, detail='Paper not found with the given ID')

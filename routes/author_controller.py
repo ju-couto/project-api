@@ -30,12 +30,10 @@ def get_all_authors(name: Optional[str] = None, db: Session = Depends(get_db)):
     Get all authors from the database
     """
     if name:
-        authors = []
-        db_author = AuthorRepo.fetch_by_name(db, name)
+        db_author = AuthorRepo.search_by_name(db, name)
         if not db_author:
             raise HTTPException(status_code=400, detail='Author not found!')
-        authors.append(db_author)
-        return authors
+        return db_author
     else:
         return AuthorRepo.fetch_all(db)
 
@@ -44,7 +42,7 @@ def get_all_authors(name: Optional[str] = None, db: Session = Depends(get_db)):
 async def update_author(id: int, author_request: schemas.AuthorUpdate, db: Session = Depends(get_db),
                         admin: str = Depends(access_admin)):
     """
-    Update author information.
+    Update author information
     """
     if admin:
         db_author = AuthorRepo.fetch_by_id(db, id)

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+from sqlalchemy import or_
 from sql_app import models, schemas
 
 
@@ -16,6 +16,9 @@ class AuthorRepo:
 
     def fetch_by_name(db: Session, name):
         return db.query(models.Author).filter(models.Author.name.contains(name)).first()
+
+    def search_by_name(db: Session, name):
+        return db.query(models.Author).filter(models.Author.name.like('%' + name + '%')).all()
 
     def fetch_all(db: Session, skip: int = 0, limit: int = 100):
         return db.query(models.Author).offset(skip).limit(limit).all()
